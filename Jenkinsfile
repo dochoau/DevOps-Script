@@ -7,6 +7,8 @@ pipeline {
 
   environment {
     ARTIFACT_ID = "webapp:${env.BUILD_NUMBER}"
+    DOCKERHUB_CREDENTIALS = credentials('DockerHubCredentials')
+    TAGGED_VERSION = "dochoau93/webapp"
   }
 
   stages {
@@ -29,13 +31,10 @@ pipeline {
         branch 'master'
       }
       steps {
-        script {
-          docker.withRegistry("", "DockerHubCredentials") {
-            dockerImage.push()
-          }
-        }
+      	sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
+	      sh "docker tag ${env.ARTIFACT_ID} ${env.TAGGED_VERSION}"
+	      sh "docker push ${env.TAGGED_VERSION}"
       }
     }
   }
 }
-
