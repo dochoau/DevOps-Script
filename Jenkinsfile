@@ -36,5 +36,13 @@ pipeline {
 	      sh "docker push ${env.TAGGED_VERSION}"
       }
     }
+    stage('Schedule Staging Deployment') {
+      when {
+        branch 'master'
+      }
+      steps {
+        build job: 'deploy-webapp-staging', parameters: [string(name: 'ARTIFACT_ID', value: "${env.ARTIFACT_ID}")], wait: false
+      }
+    }
   }
 }
